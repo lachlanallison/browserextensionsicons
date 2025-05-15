@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG to PNG Converter for Browser Extensions</title>
+    
+    <!-- Basic Meta Tags -->
+    <meta name="description" content="Convert SVG files to PNG icons in multiple sizes (16, 32, 48, 128) for browser extensions">
+    <meta name="author" content="Your Name">
+    <meta name="keywords" content="SVG, PNG, converter, browser extension, icons, web development">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons">
+    <meta property="og:title" content="SVG to PNG Converter for Browser Extensions">
+    <meta property="og:description" content="Convert SVG files to PNG icons in multiple sizes (16, 32, 48, 128) for browser extensions">
+    <meta property="og:image" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons/screenshot.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="SVG to PNG Converter">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@lachlanallison">
+    <meta name="twitter:creator" content="@lachlanallison">
+    <meta name="twitter:url" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons">
+    <meta name="twitter:title" content="SVG to PNG Converter for Browser Extensions">
+    <meta name="twitter:description" content="Convert SVG files to PNG icons in multiple sizes (16, 32, 48, 128) for browser extensions">
+    <meta name="twitter:image" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons/screenshot.png">
+    
+    <!-- LinkedIn -->
+    <meta property="linkedin:card" content="summary_large_image">
+    <meta property="linkedin:title" content="SVG to PNG Converter for Browser Extensions">
+    <meta property="linkedin:description" content="Convert SVG files to PNG icons in multiple sizes (16, 32, 48, 128) for browser extensions">
+    <meta property="linkedin:image" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons/screenshot.png">
+    
+    <!-- WhatsApp -->
+    <meta property="og:site_name" content="SVG to PNG Converter">
+    <meta property="og:title" content="SVG to PNG Converter for Browser Extensions">
+    <meta property="og:description" content="Convert SVG files to PNG icons in multiple sizes (16, 32, 48, 128) for browser extensions">
+    <meta property="og:image" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons/screenshot.png">
+    
+    <!-- Pinterest -->
+    <meta name="pinterest-rich-pin" content="true">
+    <meta property="og:title" content="SVG to PNG Converter for Browser Extensions">
+    <meta property="og:description" content="Convert SVG files to PNG icons in multiple sizes (16, 32, 48, 128) for browser extensions">
+    <meta property="og:image" content="https://lachlanallison.github.io/SVGtoPNGExtensionIcons/screenshot.png">
+    
+    <!-- Materialize CSS for styling -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+body {
+    padding: 40px;
+    text-align: center;
+    background-color: #f0f8ff; /* Light blue background */
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: auto;
+}
+
+h4 {
+    color: #1e88e5; /* Blue color for the heading */
+    margin-bottom: 20px;
+}
+
+p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.file-field .btn {
+    background-color: #1e88e5; /* Main blue button color */
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+}
+
+.file-field .btn:hover {
+    background-color: #1565c0; /* Darker blue on hover */
+}
+
+button {
+    background-color: #1e88e5; /* Main blue button color */
+    margin-top: 20px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* Ensures text is centered */
+    height: 48px; /* Consistent height with other buttons */
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
+button:hover {
+    background-color: #1565c0; /* Darker blue on hover */
+}
+
+#error-message {
+    color: red;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.download-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.download-buttons a {
+    min-width: 120px;
+    display: inline-flex;
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    border-radius: 5px;
+    background-color: #1e88e5; /* Blue background */
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.download-buttons a:hover {
+    background-color: #1565c0; /* Darker blue for hover effect */
+}
+
+.download-buttons a:active {
+    background-color: #0d47a1; /* Darker blue for active effect */
+}
+
+#downloadZipBtn {
+    display: block;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #1e88e5; /* Blue for the ZIP button */
+    color: white;
+    border-radius: 5px;
+    height: 48px; /* Match the height of other buttons */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#downloadZipBtn:hover {
+    background-color: #1565c0; /* Darker blue on hover */
+}
+
+#convertBtn {
+    background-color: #1e88e5; /* Main blue color */
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    height: 48px; /* Same height as other buttons */
+    white-space: nowrap; /* Prevent text from wrapping */
+    display: inline-flex;
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    border: none;
+    cursor: pointer;
+}
+
+#convertBtn:disabled {
+    background-color: #b3d9ff; /* Light blue when disabled */
+    cursor: not-allowed;
+}
+
+pre {
+    text-align: left;
+    background: #f4f4f4;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 30px;
+    overflow-x: auto;
+}
+
+#screenshotBtn {
+    background-color: #1e88e5;
+    margin-top: 20px;
+    border-radius: 5px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    white-space: nowrap;
+}
+
+#screenshotBtn:hover {
+    background-color: #1565c0;
+}
+
+#screenshotPreview {
+    max-width: 100%;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h4>SVG to PNG Converter for Browser Extensions</h4>
+        <p>Select an SVG file, and it will generate PNG icons in sizes: 16, 32, 48, and 128.</p>
+
+        <div class="file-field input-field">
+            <div class="btn">
+                <span>Upload SVG</span>
+                <input type="file" id="svgInput" accept="image/svg+xml">
+            </div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="Choose an SVG file">
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn waves-effect waves-light" disabled>Convert to PNGs</button>
+
+        <div id="error-message" style="display: none;" class="error-message"></div>
+        <div id="downloads" class="download-buttons"></div>
+        <button id="downloadZipBtn" class="btn waves-effect waves-light" style="display: none;">Download All as ZIP</button>
+        
+
+        <h5>Example manifest.json for Chrome & Firefox Extensions</h5>
+        <pre>{
+  "manifest_version": 3,
+  "name": "My Extension",
+  "version": "1.0",
+  "icons": {
+    "16": "icon-16.png",
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}</pre>
+    </div>
+
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Check if there is a file selected when the page loads
+    const fileInput = document.getElementById("svgInput");
+    const convertBtn = document.getElementById("convertBtn");
+    const errorMessageDiv = document.getElementById("error-message");
+
+    // If there's a file selected (on page load after refresh)
+    if (fileInput.files.length > 0) {
+        handleFile({ target: { files: fileInput.files } });
+    } else {
+        convertBtn.disabled = true;
+        errorMessageDiv.style.display = "none";
+    }
+});
+
+document.getElementById("svgInput").addEventListener("change", handleFile);
+document.getElementById("convertBtn").addEventListener("click", convertSvg);
+document.getElementById("downloadZipBtn").addEventListener("click", downloadZip);
+
+let svgDataUrl = "";
+let pngFiles = [];
+
+function handleFile(event) {
+    const file = event.target.files[0];
+    const errorMessageDiv = document.getElementById("error-message");
+
+    // Check if a file is selected
+    if (file) {
+        if (file.type === "image/svg+xml") {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                svgDataUrl = e.target.result;
+                document.getElementById("convertBtn").disabled = false;
+                errorMessageDiv.style.display = "none"; // Hide error message if file is valid
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Invalid file type selected
+            svgDataUrl = "";
+            document.getElementById("convertBtn").disabled = true;
+            errorMessageDiv.style.display = "block";
+            errorMessageDiv.textContent = "Please select a valid SVG file.";
+        }
+    } else {
+        // No file selected
+        svgDataUrl = "";
+        document.getElementById("convertBtn").disabled = true;
+        errorMessageDiv.style.display = "block";
+        errorMessageDiv.textContent = "Please select an SVG file before converting.";
+    }
+}
+
+function convertSvg() {
+    if (!svgDataUrl) return;
+
+    const sizes = [16, 32, 48, 128];
+    const downloadsDiv = document.getElementById("downloads");
+    downloadsDiv.innerHTML = "<h6>Download PNGs:</h6>";
+    pngFiles = [];
+
+    sizes.forEach(size => {
+        const img = new Image();
+        img.src = svgDataUrl;
+
+        img.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext("2d");
+
+            // Draw SVG onto canvas
+            ctx.drawImage(img, 0, 0, size, size);
+
+            // Convert to PNG
+            const pngDataUrl = canvas.toDataURL("image/png");
+
+            // Create a download link
+            const link = document.createElement("a");
+            link.href = pngDataUrl;
+            link.download = `icon-${size}.png`;
+            link.className = "btn-small waves-effect waves-light";
+            link.innerText = `${size}px`;
+            downloadsDiv.appendChild(link);
+
+            pngFiles.push({ name: `icon-${size}.png`, dataUrl: pngDataUrl });
+        };
+    });
+
+    // Show the "Download All as ZIP" button
+    document.getElementById("downloadZipBtn").style.display = "block";
+}
+
+function downloadZip() {
+    const zip = new JSZip();
+
+    pngFiles.forEach(file => {
+        zip.file(file.name, file.dataUrl.split(",")[1], { base64: true });
+    });
+
+    zip.generateAsync({ type: "blob" }).then(content => {
+        saveAs(content, "icons.zip");
+    });
+}
+
+    </script>
+</body>
+</html>
